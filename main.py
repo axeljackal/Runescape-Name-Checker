@@ -15,12 +15,13 @@ import pandas as pd
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
+import logging
 
 class RunescapeNameChecker:
     def __init__(self):
         self.root = ctk.CTk()
         self.root.geometry("700x500")
-        self.root.title("RSNChecker v1.7")
+        self.root.title("RSNChecker v1.8")
         self.root.resizable(False, False)
         
         # Initialize stop flag for thread control
@@ -35,11 +36,17 @@ class RunescapeNameChecker:
         self.results_data = []  # Store results for export
         self.max_workers = 5  # Number of concurrent threads
         
+        # New: Detailed name status tracking
+        self.name_status = {}  # {name: {"status": "pending/checked/error", "available": True/False/None, "error": str, "timestamp": str}}
+        
+        # Setup logging
+        self.setup_logging()
+        
         # Load progress after GUI is created (moved to end of __init__)
         
         # ======= Search Frame =========
         
-        self.search_frame = ctk.CTkFrame(self.root, width=355, height=110)
+        self.search_frame = ctk.CTkFrame(self.root, width=355, height=160)
         self.search_frame.place(x=10, y=10)
         
         # Search Label
@@ -101,7 +108,7 @@ class RunescapeNameChecker:
         self.progress_bar = ctk.CTkFrame(
             self.search_frame,
             width=220,
-            height=60
+            height=25
         )
         self.progress_bar.place(x=10, y=70)
         
@@ -119,7 +126,7 @@ class RunescapeNameChecker:
             text="Workers:",
             font=("Roboto Medium", 10),
         )
-        self.workers_label.place(x=10, y=140)
+        self.workers_label.place(x=10, y=100)
         
         self.workers_slider = ctk.CTkSlider(
             self.search_frame,
@@ -130,14 +137,14 @@ class RunescapeNameChecker:
             command=self.update_workers,
         )
         self.workers_slider.set(5)
-        self.workers_slider.place(x=75, y=143)
+        self.workers_slider.place(x=75, y=103)
         
         self.workers_value_label = ctk.CTkLabel(
             self.search_frame,
             text="5",
             font=("Roboto Medium", 10),
         )
-        self.workers_value_label.place(x=185, y=140)
+        self.workers_value_label.place(x=185, y=100)
         
         
         # ========= Source (Right) Frame =========
@@ -220,7 +227,7 @@ class RunescapeNameChecker:
         self.clear_progress_button.place(x=380, y=425)
 
         self.random_frame = ctk.CTkFrame(self.root, width=355, height=90)
-        self.random_frame.place(x=10, y=170)
+        self.random_frame.place(x=10, y=180)
 
         self.two_letter = ctk.CTkButton(
             self.random_frame,
@@ -287,20 +294,43 @@ class RunescapeNameChecker:
         # Logs text
         self.logs_text = ctk.CTkTextbox(
             self.root,
-            width=485,
+            width=355,
             height=210,
             font=("Roboto Medium", 10),
             border_color="white",
             border_width=1
         )
-        self.logs_text.insert('end', f"RSNChecker v1.7\n")
-        self.logs_text.insert('end', f"https://github.com/Aellas/RSNChecker\n")
+        self.logs_text.insert('end', f"RSNChecker v1.8\n")
+        self.logs_text.insert('end', f"https://github.com/axeljackal/Runescape-Name-Checker\n")
         self.logs_text.insert('end', f"\n{functions.time.get_time()}: GUI started\n")
 
         self.logs_text.place(x=10, y=270)
         
         # Load progress after all widgets are created
         self.load_progress()
+    
+    def setup_logging(self):
+        """Setup file logging for each run."""
+        # Create logs directory if it doesn't exist
+        if not os.path.exists('logs'):
+            os.makedirs('logs')
+        
+        # Create log file with timestamp
+        log_filename = f"logs/rsn_checker_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+        
+        # Configure logging
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler(log_filename, encoding='utf-8'),
+                logging.StreamHandler()  # Also print to console
+            ]
+        )
+        
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("RSNChecker v1.8 started")
+        self.logger.info(f"Log file: {log_filename}")
         
     def check_name_availability(self, name: str, source: str):
         """Check if a name is available on the specified platform."""
@@ -347,41 +377,57 @@ class RunescapeNameChecker:
         self.root.after(0, lambda: self.guide_textbox.insert("end", name + "\n"))
     
     def load_progress(self):
-        """Load previously checked names from progress file."""
+        """Load previously checked names with detailed status."""
         try:
             if os.path.exists(self.progress_file):
-                with open(self.progress_file, 'r') as f:
+                with open(self.progress_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     with self.data_lock:
-                        self.checked_names = set(data.get('checked_names', []))
-                    if self.checked_names:
-                        self.log_message(f"{functions.time.get_time()}: Loaded {len(self.checked_names)} previously checked names")
+                        # Load detailed name status
+                        self.name_status = data.get('name_status', {})
+                        # For backward compatibility, build checked_names set
+                        self.checked_names = {name for name, info in self.name_status.items() 
+                                             if info.get('status') == 'checked'}
+                    
+                    if self.name_status:
+                        checked_count = len(self.checked_names)
+                        error_count = sum(1 for info in self.name_status.values() if info.get('status') == 'error')
+                        self.log_message(f"{functions.time.get_time()}: Loaded progress - {checked_count} checked, {error_count} errors")
+                        self.logger.info(f"Loaded progress: {checked_count} checked, {error_count} errors")
         except Exception as e:
             with self.data_lock:
                 self.checked_names = set()
+                self.name_status = {}
+            self.logger.error(f"Error loading progress: {e}")
             print(f"Error loading progress: {e}")
     
     def save_progress(self):
-        """Save checked names to progress file (thread-safe)."""
+        """Save detailed progress with name status (thread-safe)."""
         try:
             with self.data_lock:
-                checked_names_copy = list(self.checked_names)
+                name_status_copy = self.name_status.copy()
             
-            with open(self.progress_file, 'w') as f:
+            with open(self.progress_file, 'w', encoding='utf-8') as f:
                 json.dump({
-                    'checked_names': checked_names_copy,
-                    'last_updated': datetime.now().isoformat()
-                }, f)
+                    'name_status': name_status_copy,
+                    'last_updated': datetime.now().isoformat(),
+                    'version': '1.8'
+                }, f, indent=2, ensure_ascii=False)
+            
+            self.logger.info(f"Progress saved: {len(name_status_copy)} names tracked")
         except Exception as e:
+            self.logger.error(f"Error saving progress: {e}")
             print(f"Error saving progress: {e}")
     
     def clear_progress(self):
         """Clear progress file and checked names."""
         with self.data_lock:
             self.checked_names = set()
+            self.name_status = {}
         if os.path.exists(self.progress_file):
             os.remove(self.progress_file)
         self.log_message(f"{functions.time.get_time()}: Progress cleared")
+        self.logger.info("Progress cleared by user")
     
     def load_file(self):
         """Load usernames from a text file."""
@@ -402,8 +448,11 @@ class RunescapeNameChecker:
                     # Count names
                     name_count = len([n.strip() for n in names.split(',') if n.strip()])
                     self.log_message(f"Loaded {name_count} names from file: {os.path.basename(file_path)}")
+                    self.logger.info(f"Loaded {name_count} names from file: {file_path}")
             except Exception as e:
-                self.log_message(f"[error] Failed to load file: {str(e)}")
+                error_msg = f"[error] Failed to load file: {str(e)}"
+                self.log_message(error_msg)
+                self.logger.error(error_msg)
     
     def update_workers(self, value):
         """Update the number of worker threads."""
@@ -411,33 +460,71 @@ class RunescapeNameChecker:
         self.workers_value_label.configure(text=str(self.max_workers))
     
     def check_single_name(self, name: str, source: str) -> dict:
-        """Check a single name and return result as dict."""
-        result = self.check_name_availability(name, source)
+        """Check a single name with rate limiting and detailed status tracking."""
+        # Rate limiting: 100ms delay per check
+        time.sleep(0.1)
         
         result_dict = {
             'name': name,
             'source': source,
             'available': None,
-            'error': None
+            'error': None,
+            'status': 'pending'
         }
         
-        if result is True:
-            result_dict['available'] = True
-        elif result is False:
-            result_dict['available'] = False
-        elif isinstance(result, tuple) and result[0] == "error":
-            result_dict['available'] = False
-            result_dict['error'] = result[1]
-        
-        # Small delay to avoid API rate limiting
-        time.sleep(0.1)
+        try:
+            result = self.check_name_availability(name, source)
+            
+            if result is True:
+                result_dict['available'] = True
+                result_dict['status'] = 'checked'
+            elif result is False:
+                result_dict['available'] = False
+                result_dict['status'] = 'checked'
+            elif isinstance(result, tuple) and result[0] == "error":
+                result_dict['available'] = False
+                result_dict['error'] = result[1]
+                result_dict['status'] = 'error'
+            
+            # Update name status
+            with self.data_lock:
+                self.name_status[name] = {
+                    'status': result_dict['status'],
+                    'available': result_dict['available'],
+                    'source': source,
+                    'timestamp': datetime.now().isoformat(),
+                    'error': result_dict.get('error')
+                }
+            
+            if result_dict['status'] == 'checked':
+                self.logger.info(f"Checked {name} ({source}): {'Available' if result_dict['available'] else 'Taken'}")
+            else:
+                self.logger.error(f"Error checking {name} ({source}): {result_dict['error']}")
+                
+        except Exception as e:
+            error_msg = str(e)
+            result_dict['error'] = error_msg
+            result_dict['status'] = 'error'
+            
+            # Mark as error (can be retried later)
+            with self.data_lock:
+                self.name_status[name] = {
+                    'status': 'error',
+                    'available': None,
+                    'source': source,
+                    'timestamp': datetime.now().isoformat(),
+                    'error': error_msg
+                }
+            
+            self.logger.error(f"Exception checking {name} ({source}): {error_msg}")
         
         return result_dict
     
     def export_results(self):
-        """Export results to CSV or XLSX file."""
+        """Export results to CSV or XLSX file with enhanced status tracking."""
         if not self.results_data:
             self.log_message("[info] No results to export")
+            self.logger.warning("Export attempted with no results")
             return
         
         # Ask user for file type and location
@@ -451,21 +538,31 @@ class RunescapeNameChecker:
             try:
                 # Create DataFrame
                 df = pd.DataFrame(self.results_data)
-                df['AVAILABLE'] = df['available'].apply(lambda x: 'YES' if x else 'NO')
+                
+                # Add formatted columns
+                df['AVAILABLE'] = df['available'].apply(lambda x: 'YES' if x else ('NO' if x is False else 'ERROR'))
+                df['STATUS'] = df['status'].str.upper()
                 
                 # Select and reorder columns
-                export_df = df[['name', 'AVAILABLE']].copy()
-                export_df.columns = ['NAME', 'AVAILABLE']
+                columns = ['name', 'AVAILABLE', 'STATUS']
+                if 'error' in df.columns:
+                    columns.append('error')
+                
+                export_df = df[columns].copy()
+                export_df.columns = [col.upper() for col in columns]
                 
                 # Export based on file extension
                 if file_path.endswith('.csv'):
-                    export_df.to_csv(file_path, index=False)
+                    export_df.to_csv(file_path, index=False, encoding='utf-8')
                 else:
                     export_df.to_excel(file_path, index=False, engine='openpyxl')
                 
                 self.log_message(f"[success] Results exported to: {os.path.basename(file_path)}")
+                self.logger.info(f"Results exported to {file_path} ({len(export_df)} rows)")
             except Exception as e:
-                self.log_message(f"[error] Export failed: {str(e)}")
+                error_msg = f"[error] Export failed: {str(e)}"
+                self.log_message(error_msg)
+                self.logger.error(f"Export failed: {e}")
 
     def search_name(self, name_entry_text: str, source: str):
         """Main search function that runs in a separate thread with multi-threading."""
@@ -484,13 +581,21 @@ class RunescapeNameChecker:
                 if not stripped_name:
                     continue
                 
-                # Thread-safe check for already checked names
+                # Thread-safe check for name status
                 with self.data_lock:
-                    already_checked = stripped_name in self.checked_names
+                    status_info = self.name_status.get(stripped_name, {})
+                    status = status_info.get('status', 'pending')
                 
-                if already_checked:
-                    self.log_message(f"[skipped] {stripped_name} - already checked")
+                # Skip if already successfully checked (available or taken)
+                if status == 'checked':
+                    available = status_info.get('available')
+                    status_text = 'Available' if available else 'Taken'
+                    self.log_message(f"[skipped] {stripped_name} - already checked ({status_text})")
                     continue
+                
+                # Allow retries for errors
+                if status == 'error':
+                    self.log_message(f"[retry] {stripped_name} - retrying after previous error")
                     
                 # Validate name length
                 if len(stripped_name) > 12:
@@ -520,11 +625,15 @@ class RunescapeNameChecker:
                 return
             
             total_names = len(valid_names)
-            self.log_message(f"[info] Starting check for {total_names} names with {self.max_workers} workers")
+            
+            # Use optimal number of workers based on number of names
+            # Don't use more workers than names available
+            actual_workers = min(self.max_workers, total_names)
+            self.log_message(f"[info] Starting check for {total_names} names with {actual_workers} workers")
             
             # Use ThreadPoolExecutor for concurrent checking
             completed = 0
-            with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            with ThreadPoolExecutor(max_workers=actual_workers) as executor:
                 # Submit all tasks
                 future_to_name = {
                     executor.submit(self.check_single_name, name, source): name 
@@ -535,26 +644,29 @@ class RunescapeNameChecker:
                 for future in as_completed(future_to_name):
                     if self.stop_event.is_set():
                         self.log_message(f"{functions.time.get_time()}: Search stopped by user")
+                        self.logger.info(f"Search stopped by user at {completed}/{total_names}")
                         break
                     
                     name = future_to_name[future]
                     try:
                         result_dict = future.result()
                         
-                        # Thread-safe: Add to checked names and save progress
+                        # Thread-safe: Add to results data
                         with self.data_lock:
-                            self.checked_names.add(name)
+                            # Only add to checked_names if successfully checked
+                            if result_dict['status'] == 'checked':
+                                self.checked_names.add(name)
                             self.results_data.append(result_dict)
                         
-                        # Update UI
-                        if result_dict['available'] is True:
-                            self.add_result(name)
-                            self.log_message(f"[result] {name} not found on {source} -> potentially available")
-                        elif result_dict['available'] is False:
-                            if result_dict['error']:
-                                self.log_message(f"[error] {name}: {result_dict['error']}")
-                            else:
+                        # Update UI based on result
+                        if result_dict['status'] == 'checked':
+                            if result_dict['available'] is True:
+                                self.add_result(name)
+                                self.log_message(f"[result] {name} not found on {source} -> potentially available")
+                            elif result_dict['available'] is False:
                                 self.log_message(f"[result] {name} found on {source} -> taken")
+                        elif result_dict['status'] == 'error':
+                            self.log_message(f"[error] {name}: {result_dict['error']}")
                         
                         completed += 1
                         self.update_progress(f"Checked {completed}/{total_names} names")
@@ -565,15 +677,24 @@ class RunescapeNameChecker:
                         
                     except Exception as e:
                         self.log_message(f"[error] {name}: {str(e)}")
+                        self.logger.error(f"Exception processing result for {name}: {e}")
                         completed += 1
             
             # Save final progress
             self.save_progress()
             
+            # Calculate summary
+            with self.data_lock:
+                checked_count = sum(1 for r in self.results_data if r.get('status') == 'checked')
+                error_count = sum(1 for r in self.results_data if r.get('status') == 'error')
+                available_count = sum(1 for r in self.results_data if r.get('available') is True)
+            
             # Search completed
             if not self.stop_event.is_set():
-                self.update_progress(f"Complete: {completed}/{total_names}")
-                self.log_message(f"{functions.time.get_time()}: Search completed - {completed} names checked")
+                summary = f"Complete: {checked_count} checked, {available_count} available, {error_count} errors"
+                self.update_progress(summary)
+                self.log_message(f"{functions.time.get_time()}: Search completed - {summary}")
+                self.logger.info(f"Search completed: {summary}")
             
         except Exception as e:
             # Handle any unexpected errors
