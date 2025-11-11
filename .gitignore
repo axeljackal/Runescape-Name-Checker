@@ -141,6 +141,7 @@ progress.json
 rsn_results_*.xlsx
 logs/
 output/
+input/
 
 # Temporary files
 *.tmp
