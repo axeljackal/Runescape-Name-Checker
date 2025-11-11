@@ -443,13 +443,18 @@ class RunescapeNameChecker:
     
     def clear_progress(self):
         """Clear progress file and checked names."""
-        with self.data_lock:
-            self.checked_names = set()
-            self.name_status = {}
-        if os.path.exists(self.progress_file):
-            os.remove(self.progress_file)
-        self.log_message(f"{functions.time.get_time()}: Progress cleared")
-        self.logger.info("Progress cleared by user")
+        try:
+            with self.data_lock:
+                self.checked_names = set()
+                self.name_status = {}
+            if os.path.exists(self.progress_file):
+                os.remove(self.progress_file)
+            self.log_message(f"{functions.time.get_time()}: Progress cleared")
+            self.logger.info("Progress cleared by user")
+        except Exception as e:
+            error_msg = f"[error] Failed to clear progress: {str(e)}"
+            self.log_message(error_msg)
+            self.logger.error(error_msg)
     
     def load_file(self):
         """Load usernames from a text file."""
@@ -817,7 +822,11 @@ class RunescapeNameChecker:
         # Disable export button during search
         self.export_button.configure(state="disabled")
         
-        # Clear previous results
+        # Clear previous results to prevent unbounded memory growth
+        with self.data_lock:
+            self.results_data = []
+        
+        # Clear results display
         self.guide_textbox.delete(1.0, "end")
         
         # Read input values BEFORE starting thread (thread-safe)
