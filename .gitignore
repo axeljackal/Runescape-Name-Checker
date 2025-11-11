@@ -138,6 +138,7 @@ desktop.ini
 progress.json
 *.xlsx
 *.csv
+logs/
 
 # Temporary files
 *.tmp
