@@ -4,7 +4,7 @@
 
 ### Installation
 1. Download and install [Python](https://www.python.org/) (3.7 or higher)
-2. Clone the repository: `git clone https://github.com/aellas/Runescape-Name-Checker.git`
+2. Clone the repository: `git clone https://github.com/axeljackal/Runescape-Name-Checker.git`
 3. Navigate to directory: `cd Runescape-Name-Checker`
 4. Install dependencies: `pip install -r requirements.txt`
 5. Run the application: `python main.py`
@@ -282,7 +282,7 @@ A: CSV and XLSX (Excel).
 
 ## Support
 
-- **Issues**: Report on [GitHub Issues](https://github.com/aellas/Runescape-Name-Checker/issues)
+- **Issues**: Report on [GitHub Issues](https://github.com/axeljackal/Runescape-Name-Checker/issues)
 - **Feature requests**: Create an issue with tag "enhancement"
 - **Documentation**: README.md and this guide
 
