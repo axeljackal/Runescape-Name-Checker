@@ -75,11 +75,11 @@
 
 **Option 1: Button**
 1. Click "Load File" button
-2. Select a .txt file with one name per line
+2. Select a .txt file with one name per line (recommended to keep in `input/` folder)
 3. Names will automatically populate the input field
 
 **Option 2: Drag & Drop** 🆕
-1. Open your .txt file in File Explorer
+1. Place your .txt file in the `input/` folder
 2. Drag the file and drop it anywhere on the RSNChecker window
 3. Names will automatically populate the input field
 4. See confirmation in logs: "📂 Dropped X names from: filename.txt"
