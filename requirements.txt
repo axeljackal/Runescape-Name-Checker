@@ -1,6 +1,7 @@
 rs3_api
 python-osrsapi
 customtkinter
+tkinterdnd2
 pyperclip
 pandas
 openpyxl
