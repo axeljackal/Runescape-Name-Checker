@@ -1,9 +1,5 @@
 # Changelog
 
-All notable changes to RSNChecker will be documented in this file.
-
-# Changelog
-
 All notable changes to the Runescape Name Checker project will be documented in this file.
 
 ## [1.8.0] - 2025-11-11
