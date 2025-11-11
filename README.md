@@ -1,6 +1,31 @@
 # 🔎 RSNChecker [Version: 1.7]
 
+# 🔎 RSNChecker [Version: 1.8]
+
 **RSNChecker** is an open-source project written in Python that allows you to search for a Runescape name to see if it's available. You can search for either a single username or enter multiple usernames (I've tested 500 usernames at once) with the added benefit of either checking OSRS Hiscores or RS3 Hiscores.
+
+## ✨ What's New in Version 1.8
+
+- 📋 **Enhanced Progress Tracking**: Detailed per-name status with retry capability for errors
+- 📝 **Run-Specific Logging**: Automatic log file creation for each run (timestamped)
+- 🔄 **Smart Retry Logic**: Failed checks are retryable, successful checks are skipped
+- 📊 **Better Export**: CSV/XLSX exports now include status and error columns
+- 🎯 **Detailed Statistics**: Track checked, available, taken, and error counts
+- 🗂️ **Improved Progress Format**: JSON with per-name metadata (status, timestamp, error details)
+
+## 🎯 Features
+
+- **Enhanced Progress Tracking**: Per-name status tracking (checked/error/pending) with retry capability
+- **Run-Specific Logging**: Automatic timestamped log files in `logs/` directory for debugging
+- **File Loading**: Load usernames from .txt files for easy batch processing
+- **Multi-Threading**: Check multiple names simultaneously (1-10 concurrent workers)
+- **Export Results**: Save results to CSV or XLSX with status and error information
+- **Batch Search**: Check multiple usernames at once (tested with 500+ names)
+- **Dual Platform Support**: Search both OSRS and RS3 Hiscores
+- **Random Name Generator**: Generate 2-3 letter/number combinations for rare names
+- **Real-time Logging**: See detailed progress, validation, and results
+- **Non-blocking UI**: Responsive interface that never freezes
+- **Smart Validation**: Comprehensive input validation with helpful error messages
 
 ## ✨ What's New in Version 1.7
 
@@ -33,7 +58,7 @@
 
 # ✍️ Manual Setup
 + Download [Python](https://www.python.org/)
-+ Clone repo `https://github.com/aellas/Runescape-Name-Checker.git`
++ Clone repo `https://github.com/axeljackal/Runescape-Name-Checker.git`
 + Install requirements `pip install -r requirements.txt`
 + Run code `python3 main.py` <br />
 
@@ -57,14 +82,15 @@
 ## Progress Tracking
 - Progress automatically saves to `progress.json`
 - If interrupted, restart the app and continue searching
-- Already-checked names are automatically skipped
+- Already-checked names are automatically skipped (errors are retryable)
 - Click "Clear Progress" to reset checkpoint data
+- Check `logs/` directory for detailed run logs with timestamps
 
 ## Export Results
 1. After checking names, click "Export Results"
 2. Choose CSV or XLSX format
 3. Select save location
-4. Opens organized spreadsheet with NAME and AVAILABLE columns
+4. Opens organized spreadsheet with NAME, AVAILABLE, STATUS, and ERROR columns
 
 # ✏️ Generate
 You can now generate (50) unique 2/3 letter /+ number RSN's to check
