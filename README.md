@@ -12,12 +12,14 @@
 - 📊 **Better Export**: CSV/XLSX exports now include status and error columns
 - 🎯 **Detailed Statistics**: Track checked, available, taken, and error counts
 - 🗂️ **Improved Progress Format**: JSON with per-name metadata (status, timestamp, error details)
+- 🖱️ **Drag & Drop Support**: Drag .txt files directly onto the window to load names
 
 ## 🎯 Features
 
 - **Enhanced Progress Tracking**: Per-name status tracking (checked/error/pending) with retry capability
 - **Run-Specific Logging**: Automatic timestamped log files in `logs/` directory for debugging
-- **File Loading**: Load usernames from .txt files for easy batch processing
+- **Drag & Drop Support**: Simply drag .txt files onto the window to load names instantly
+- **File Loading**: Load usernames from .txt files via button or drag & drop
 - **Multi-Threading**: Check multiple names simultaneously (1-10 concurrent workers)
 - **Export Results**: Save results to CSV or XLSX with status and error information
 - **Batch Search**: Check multiple usernames at once (tested with 500+ names)
@@ -70,9 +72,17 @@
 3. Click "Check Name Availability"
 
 ## File Loading
+
+**Option 1: Button**
 1. Click "Load File" button
 2. Select a .txt file with one name per line
 3. Names will automatically populate the input field
+
+**Option 2: Drag & Drop** 🆕
+1. Open your .txt file in File Explorer
+2. Drag the file and drop it anywhere on the RSNChecker window
+3. Names will automatically populate the input field
+4. See confirmation in logs: "📂 Dropped X names from: filename.txt"
 
 ## Multi-Threading
 - Use the slider to adjust concurrent workers (1-10)
@@ -87,10 +97,11 @@
 - Check `logs/` directory for detailed run logs with timestamps
 
 ## Export Results
+
 1. After checking names, click "Export Results"
-2. Choose CSV or XLSX format
-3. Select save location
-4. Opens organized spreadsheet with NAME, AVAILABLE, STATUS, and ERROR columns
+2. File automatically saves to `output/rsn_results_YYYYMMDD_HHMMSS.xlsx`
+3. Opens in output folder with timestamp
+4. Includes NAME, AVAILABLE, STATUS, and ERROR columns
 
 # ✏️ Generate
 You can now generate (50) unique 2/3 letter /+ number RSN's to check
