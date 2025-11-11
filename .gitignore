@@ -138,7 +138,9 @@ desktop.ini
 progress.json
 *.xlsx
 *.csv
+rsn_results_*.xlsx
 logs/
+output/
 
 # Temporary files
 *.tmp
