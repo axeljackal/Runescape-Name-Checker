@@ -2,7 +2,63 @@
 
 All notable changes to RSNChecker will be documented in this file.
 
-## [1.7] - 2025-11-11
+# Changelog
+
+All notable changes to the Runescape Name Checker project will be documented in this file.
+
+## [1.8.0] - 2025-11-11
+
+### Added
+- **Enhanced Progress Tracking System**: Complete redesign with detailed per-name status
+  - Per-name status tracking: `checked`, `error`, or `pending`
+  - Detailed metadata: availability status, source, timestamp, error messages
+  - Smart retry logic: errors marked as retryable, successful checks skipped
+  - Statistics tracking: total checked, available, taken, and errors
+  
+- **Run-Specific Logging**: Comprehensive file-based logging system
+  - Automatic log file creation with timestamp: `logs/rsn_checker_YYYYMMDD_HHMMSS.log`
+  - Detailed logging of all operations: checks, errors, retries, exports
+  - Persistent log history for debugging and audit trails
+  - Console and file output in parallel
+
+- **Improved Progress JSON Structure**:
+  ```json
+  {
+    "name_status": {
+      "PlayerName": {
+        "status": "checked|error|pending",
+        "available": true|false|null,
+        "source": "OSRS Hiscores|RS3 Hiscores",
+        "timestamp": "ISO-8601 timestamp",
+        "error": "optional error message"
+      }
+    },
+    "last_updated": "ISO-8601 timestamp",
+    "version": "1.8"
+  }
+  ```
+
+- **Enhanced Export Functionality**:
+  - Added `STATUS` column to exports (CHECKED/ERROR)
+  - Added `ERROR` column with error messages (when applicable)
+  - Better error handling with detailed logging
+
+### Changed
+- Progress tracking now distinguishes between successful checks and errors
+- Errors can be retried (not marked as permanently "checked")
+- Export format includes status and error information
+- Skip logic only applies to successfully checked names
+- Better completion summaries with breakdown of checked/available/errors
+
+### Technical
+- Added `logging` module for file-based logging
+- New `name_status` dictionary for detailed state tracking
+- `setup_logging()` method creates per-run log files
+- Enhanced `check_single_name()` with comprehensive error tracking
+- Updated `load_progress()` and `save_progress()` for new JSON structure
+- Backward compatible with old progress.json format
+
+## [1.7.0] - 2025-11-11
 
 ### 🚀 Major Features
 
