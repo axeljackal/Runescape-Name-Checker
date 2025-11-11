@@ -21,6 +21,13 @@ All notable changes to the Runescape Name Checker project will be documented in 
   - Persistent log history for debugging and audit trails
   - Console and file output in parallel
 
+- **Drag & Drop File Loading**: Intuitive file loading UX
+  - Drag .txt files from File Explorer directly onto the application window
+  - Automatic file validation (only .txt files accepted)
+  - Visual feedback in logs with 📂 icon
+  - Works alongside existing "Load File" button
+  - Updated placeholder text: "Enter usernames or drop .txt file here"
+
 - **Improved Progress JSON Structure**:
   ```json
   {
@@ -52,11 +59,18 @@ All notable changes to the Runescape Name Checker project will be documented in 
 
 ### Technical
 - Added `logging` module for file-based logging
+- Added `tkinterdnd2` for drag & drop functionality
 - New `name_status` dictionary for detailed state tracking
 - `setup_logging()` method creates per-run log files
+- `on_file_drop()` method handles drag & drop events
 - Enhanced `check_single_name()` with comprehensive error tracking
 - Updated `load_progress()` and `save_progress()` for new JSON structure
 - Backward compatible with old progress.json format
+- Root window uses `TkinterDnD.Tk()` for DnD support
+- Window-level drag & drop registration via `drop_target_register(DND_FILES)`
+
+### Dependencies
+- Added `tkinterdnd2` to requirements.txt for drag & drop support
 
 ## [1.7.0] - 2025-11-11
 
