@@ -1,5 +1,3 @@
-# 🔎 RSNChecker [Version: 1.7]
-
 # 🔎 RSNChecker [Version: 1.8]
 
 **RSNChecker** is an open-source project written in Python that allows you to search for a Runescape name to see if it's available. You can search for either a single username or enter multiple usernames (I've tested 500 usernames at once) with the added benefit of either checking OSRS Hiscores or RS3 Hiscores.
@@ -29,34 +27,9 @@
 - **Non-blocking UI**: Responsive interface that never freezes
 - **Smart Validation**: Comprehensive input validation with helpful error messages
 
-## ✨ What's New in Version 1.7
-
-- � **File Loading**: Load names from .txt files with one name per line
-- ⚡ **Multi-Threading**: Parallel name checking with configurable workers (1-10)
-- � **Progress Tracking**: Automatic checkpoint system - resume where you left off
-- 📊 **Export Results**: Export available names to CSV or XLSX format
-- 🎚️ **Worker Control**: Adjust concurrent threads with slider for optimal performance
-- 🔄 **Smart Resume**: Automatically skips already-checked names
-- �️ **Clear Progress**: Reset checkpoint data with one click
-
 # 🧭 Demo
 
 ![Image](/images/image.png?raw=true "Demo")
-
-## 🎯 Features
-
-- **File Loading**: Load usernames from .txt files for easy batch processing
-- **Multi-Threading**: Check multiple names simultaneously (1-10 concurrent workers)
-- **Progress Tracking**: Automatic checkpoints - resume interrupted searches
-- **Export Results**: Save available names to CSV or XLSX spreadsheets
-- **Batch Search**: Check multiple usernames at once (tested with 500+ names)
-- **Dual Platform Support**: Search both OSRS and RS3 Hiscores
-- **Random Name Generator**: Generate 2-3 letter/number combinations for rare names
-- **Real-time Logging**: See detailed progress, validation, and results
-- **Non-blocking UI**: Responsive interface that never freezes
-- **Smart Validation**: Comprehensive input validation with helpful error messages
-- **Copy to Clipboard**: Easily copy available names with one click
-- **Stop Anytime**: Interrupt long searches without waiting
 
 # ✍️ Manual Setup
 
