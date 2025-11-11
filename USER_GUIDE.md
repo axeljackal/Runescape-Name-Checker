@@ -3,6 +3,7 @@
 ## Quick Start
 
 ### Installation
+
 1. Download and install [Python](https://www.python.org/) (3.7 or higher)
 2. Clone the repository: `git clone https://github.com/axeljackal/Runescape-Name-Checker.git`
 3. Navigate to directory: `cd Runescape-Name-Checker`
@@ -16,12 +17,14 @@
 ### 1. Basic Name Checking
 
 **Manual Entry:**
+
 - Type names separated by commas in the input field
 - Example: `Player1, Player2, Player3`
 - Select either OSRS or RS3 Hiscores
 - Click "Check Name Availability"
 
 **What happens:**
+
 - Names are validated for proper format
 - Each name is checked against the selected Hiscores
 - Results appear in the Available Names section
@@ -32,14 +35,17 @@
 ### 2. File Loading 📁
 
 **How to use:**
+
 1. Click the **"Load File"** button
 2. Navigate to your .txt file
 3. Select the file and click Open
 
 **File format:**
+
 - One name per line
 - Plain text (.txt) files only
 - Example file content:
+
   ```
   NameOne
   NameTwo
@@ -47,6 +53,7 @@
   ```
 
 **After loading:**
+
 - All names appear in the input field (comma-separated)
 - Ready to check immediately
 
@@ -55,17 +62,20 @@
 ### 3. Multi-Threading ⚡
 
 **Worker Control:**
+
 - Use the **slider** to adjust concurrent workers (1-10)
 - Default: 5 workers
 - More workers = faster checking
 
 **Performance tips:**
+
 - Start with 5 workers (balanced)
 - If experiencing timeouts, reduce workers
 - If checking is fast, increase workers
 - Optimal setting depends on your network speed
 
 **How it works:**
+
 - Multiple names checked simultaneously
 - Each worker checks one name at a time
 - Progress updates in real-time
@@ -75,22 +85,26 @@
 ### 4. Progress Tracking 💾
 
 **Automatic saving:**
+
 - Progress saves to `progress.json` after each batch
 - Tracks which names have been checked
 - Includes timestamp of last save
 
 **Resume feature:**
+
 - If you stop mid-search and restart the app
 - Click "Check Name Availability" again
 - Already-checked names are automatically skipped
 - Only new names are checked
 
 **Clear progress:**
+
 - Click the **"Clear Progress"** button (red)
 - Resets all tracking data
 - Use before starting fresh batch
 
 **When to clear:**
+
 - Starting a new project
 - Want to re-check old names
 - Progress file corrupted
@@ -100,6 +114,7 @@
 ### 5. Export Results 📊
 
 **How to export:**
+
 1. After checking names, click **"Export Results"** (green button)
 2. Choose format: CSV or XLSX
 3. Select save location
@@ -109,18 +124,21 @@
 **File formats:**
 
 **CSV (Comma-Separated Values):**
+
 - Universal format
 - Opens in Excel, Google Sheets, etc.
 - Smaller file size
 - Simple text-based format
 
 **XLSX (Excel):**
+
 - Native Excel format
 - Better formatting
 - Supports advanced Excel features
 - Recommended for spreadsheet analysis
 
 **Export structure:**
+
 ```
 NAME          | AVAILABLE
 --------------|----------
@@ -130,6 +148,7 @@ Username3     | Yes
 ```
 
 **Use cases:**
+
 - Data analysis in Excel
 - Share results with others
 - Archive checking sessions
@@ -140,17 +159,20 @@ Username3     | Yes
 ### 6. Random Name Generator ✨
 
 **Generate random names:**
+
 - Click "2 Letter", "3 Letter", or "2 Letter + Num"
 - Generates 50 unique random names
 - Automatically fills input field
 
 **Customize generation:**
 Edit the functions in `generate/random.py`:
+
 ```python
 for _ in range(50)  # Change 50 to your desired number
 ```
 
 **Best for:**
+
 - Finding rare 2-3 letter names
 - Testing name availability patterns
 - Quick batch checking
@@ -160,6 +182,7 @@ for _ in range(50)  # Change 50 to your desired number
 ## Workflow Examples
 
 ### Example 1: Quick Manual Check
+
 ```
 1. Type: "DragonKing, SwordMaster, RuneKnight"
 2. Select: OSRS
@@ -169,6 +192,7 @@ for _ in range(50)  # Change 50 to your desired number
 ```
 
 ### Example 2: Large File Processing
+
 ```
 1. Prepare names.txt with 200 names (one per line)
 2. Click "Load File", select names.txt
@@ -182,6 +206,7 @@ for _ in range(50)  # Change 50 to your desired number
 ```
 
 ### Example 3: Interrupted Search Resume
+
 ```
 Day 1:
 1. Load file with 500 names
@@ -199,6 +224,7 @@ Day 2:
 ```
 
 ### Example 4: Multiple Sessions
+
 ```
 Session 1 - Fantasy Names:
 1. Load fantasy_names.txt
@@ -218,22 +244,26 @@ Session 2 - Gaming Names:
 ## Tips & Tricks
 
 ### Performance
+
 - **Optimal workers**: Start with 5, adjust based on speed
 - **Network issues**: Reduce workers to 2-3
 - **Fast network**: Increase to 8-10 workers
 
 ### Organization
+
 - **Name your files**: Use descriptive names (fantasy_names.txt, rare_2letter.txt)
 - **Export regularly**: Save results after each batch
 - **Clear progress**: Reset between different projects
 
 ### Best Practices
+
 - **Validate input**: Ensure names follow RuneScape format rules
 - **Monitor logs**: Watch for errors or API issues
 - **Test small first**: Try 10 names before checking 1000
 - **Use progress tracking**: For large batches, rely on auto-save
 
 ### Troubleshooting
+
 - **Names not loading**: Check file format (must be .txt, one name per line)
 - **Slow checking**: Reduce worker count or check network
 - **Export failed**: Ensure you have write permissions to save location

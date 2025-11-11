@@ -60,6 +60,7 @@ self.name_status = {
 ### JSON Structure
 
 **New progress.json format:**
+
 ```json
 {
   "name_status": {
@@ -110,6 +111,7 @@ self.name_status = {
 ## Backward Compatibility
 
 ✅ **Old progress.json files are fully supported:**
+
 - System detects old format
 - Converts to new format on load
 - Saves in new format going forward
@@ -119,6 +121,7 @@ self.name_status = {
 ### Scenario: Retry Failed Checks
 
 **Run 1 (with network issues):**
+
 ```
 [result] Player1 not found on OSRS -> potentially available
 [error] Player2: Connection timeout
@@ -127,6 +130,7 @@ self.name_status = {
 ```
 
 **Run 2 (network fixed):**
+
 ```
 [skipped] Player1 - already checked (Available)
 [retry] Player2 - retrying after previous error
@@ -137,6 +141,7 @@ self.name_status = {
 ### Scenario: Log Analysis
 
 Check `logs/rsn_checker_20251111_185210.log`:
+
 ```
 2025-11-11 18:52:10,123 - INFO - RSNChecker v1.8 started
 2025-11-11 18:52:10,234 - INFO - Loaded 150 names from file: usernames.txt
@@ -175,11 +180,13 @@ Before committing, verify:
 ## Performance Impact
 
 **Minimal overhead:**
+
 - Status dict: ~200 bytes per name (negligible for 1000s of names)
 - Logging: File I/O only when events occur
 - JSON saves: Same frequency as before (every 10 names)
 
 **Benefits:**
+
 - Retry capability saves API calls on successful checks
 - Detailed logs help debug issues faster
 - Export data enables better analysis

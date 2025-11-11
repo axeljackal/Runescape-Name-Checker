@@ -35,6 +35,7 @@ logs/rsn_checker_20251111_203001.log
 ```
 
 Each log contains:
+
 - Startup information
 - Every name check (success or failure)
 - Error details with full stack traces
@@ -105,6 +106,7 @@ The system is **backward compatible** - it can load old v1.7 progress files and 
 You run a check with poor internet connection. Some names fail with errors:
 
 **First run:**
+
 ```
 [result] Player1 not found on OSRS -> potentially available
 [error] Player2: Connection timeout
@@ -114,6 +116,7 @@ You run a check with poor internet connection. Some names fail with errors:
 
 **Second run:**
 The system automatically:
+
 - ✅ Skips `Player1` (already successfully checked as available)
 - 🔄 Retries `Player2` (marked as error)
 - ✅ Skips `Player3` (already successfully checked as taken)
@@ -128,6 +131,7 @@ logs/rsn_checker_20251111_185210.log
 ```
 
 Contains detailed information:
+
 ```
 2025-11-11 18:52:10,123 - INFO - RSNChecker v1.8 started
 2025-11-11 18:52:10,234 - INFO - Loaded progress: 150 checked, 5 errors
@@ -164,6 +168,7 @@ with self.data_lock:
 ### Progress Save Optimization
 
 Progress is saved:
+
 - Every 10 names checked (reduces I/O operations)
 - After the final name in a batch
 - When search is stopped by user
@@ -229,6 +234,7 @@ name_status = {
 ### 1. Regular Log Review
 
 Check `logs/` directory periodically:
+
 - Identify patterns in errors
 - Monitor API performance
 - Debug connectivity issues
@@ -253,6 +259,7 @@ Copy-Item progress.json progress_backup.json
 ### 4. Export Regularly
 
 Export results after each major batch:
+
 - Provides backup of your data
 - Allows external analysis in Excel
 - Creates audit trail
@@ -262,6 +269,7 @@ Export results after each major batch:
 ### Issue: Progress not saving
 
 **Check:**
+
 - ✅ Write permissions in directory
 - ✅ Disk space available
 - ✅ Check logs for errors
@@ -269,11 +277,13 @@ Export results after each major batch:
 ### Issue: All names being rechecked
 
 **Possible causes:**
+
 - progress.json was deleted
 - File permissions changed
 - Status was "error" (retry is intentional)
 
 **Solution:**
+
 - Check if `progress.json` exists
 - Verify file contains `name_status` dict
 - Review status values in JSON
@@ -281,6 +291,7 @@ Export results after each major batch:
 ### Issue: Too many errors
 
 **Investigate:**
+
 - Check log files for error patterns
 - Verify internet connection
 - Check API rate limiting

@@ -9,6 +9,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
 ## [1.8.0] - 2025-11-11
 
 ### Added
+
 - **Enhanced Progress Tracking System**: Complete redesign with detailed per-name status
   - Per-name status tracking: `checked`, `error`, or `pending`
   - Detailed metadata: availability status, source, timestamp, error messages
@@ -29,6 +30,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
   - Updated placeholder text: "Enter usernames or drop .txt file here"
 
 - **Improved Progress JSON Structure**:
+
   ```json
   {
     "name_status": {
@@ -51,6 +53,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
   - Better error handling with detailed logging
 
 ### Changed
+
 - Progress tracking now distinguishes between successful checks and errors
 - Errors can be retried (not marked as permanently "checked")
 - Export format includes status and error information
@@ -58,6 +61,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
 - Better completion summaries with breakdown of checked/available/errors
 
 ### Technical
+
 - Added `logging` module for file-based logging
 - Added `tkinterdnd2` for drag & drop functionality
 - New `name_status` dictionary for detailed state tracking
@@ -70,6 +74,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
 - Window-level drag & drop registration via `drop_target_register(DND_FILES)`
 
 ### Dependencies
+
 - Added `tkinterdnd2` to requirements.txt for drag & drop support
 
 ## [1.7.0] - 2025-11-11
@@ -77,12 +82,14 @@ All notable changes to the Runescape Name Checker project will be documented in 
 ### 🚀 Major Features
 
 #### File Loading System
+
 - **Load names from .txt files** - Click "Load File" button to select text files
 - **One name per line support** - Simple format for batch processing
 - **Auto-population** - File contents automatically fill the name entry field
 - **User-friendly file dialog** - Standard OS file picker for easy navigation
 
 #### Multi-Threading Engine
+
 - **Parallel name checking** - Uses ThreadPoolExecutor for concurrent API calls
 - **Configurable workers** - Slider control for 1-10 concurrent threads
 - **Optimal performance** - Default 5 workers balances speed and API limits
@@ -90,6 +97,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
 - **Smart thread management** - Proper cleanup and error handling per thread
 
 #### Progress Tracking & Resume
+
 - **Automatic checkpoints** - Saves progress to `progress.json` after each batch
 - **Resume capability** - Continue interrupted searches from where you left off
 - **Smart skip logic** - Already-checked names automatically excluded
@@ -98,6 +106,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
 - **Persistent across sessions** - Progress survives app restarts
 
 #### Export Functionality
+
 - **CSV export** - Save results to comma-separated values format
 - **XLSX export** - Create Excel-compatible spreadsheet files
 - **Organized columns** - Clean NAME and AVAILABLE columns
@@ -119,6 +128,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
 ### 🔧 Technical Implementation
 
 #### New Methods
+
 - `load_file()` - Opens file dialog, reads .txt, populates entry field
 - `load_progress()` - Loads checked names from progress.json
 - `save_progress()` - Saves checked names and timestamp to JSON
@@ -128,6 +138,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
 - `export_results()` - Creates DataFrame and exports to CSV/XLSX
 
 #### Modified Methods
+
 - `search_name()` - Complete rewrite using ThreadPoolExecutor
   - Loads progress before starting
   - Skips already-checked names
@@ -137,6 +148,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
   - Proper cleanup with thread pool shutdown
 
 #### New Imports
+
 - `json` - For progress.json file handling
 - `os, pathlib.Path` - For file operations
 - `tkinter.filedialog` - For file/save dialogs
@@ -146,6 +158,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
 - `queue.Queue` - For thread-safe result collection
 
 #### New Instance Variables
+
 - `self.max_workers = 5` - Default concurrent thread count
 - `self.checked_names = set()` - Track which names already checked
 - `self.results_data = []` - Store results for export
@@ -154,10 +167,12 @@ All notable changes to the Runescape Name Checker project will be documented in 
 ### 📦 Dependencies
 
 Added to requirements.txt:
+
 - `pandas` - Data manipulation and export
 - `openpyxl` - Excel file generation
 
 Existing dependencies:
+
 - rs3_api
 - python-osrsapi
 - customtkinter
@@ -183,18 +198,21 @@ Existing dependencies:
 ### 🚀 Major Improvements
 
 #### Threading & Performance
+
 - **Replaced blocking asyncio with threading** - UI now remains responsive during searches
 - **Implemented thread-safe GUI operations** - All widget updates use `root.after()` to prevent crashes
 - **Fixed worker thread data access** - Input values now read on main thread before worker starts
 - **Added threading.Event for stop control** - Replaced boolean flag with thread-safe Event object
 
 #### Error Handling & Validation
+
 - **Enhanced exception handling** - Distinguishes between "not found" (404) vs actual API/network errors
 - **Improved input validation** - Now catches names with only special characters or spaces
 - **Added validation logging** - Users see detailed feedback for why names fail validation
 - **Better error reporting** - Network and API errors shown in logs with error messages
 
 #### User Experience
+
 - **Working stop button** - Can now properly interrupt searches mid-operation
 - **Real-time progress updates** - Shows current name being checked
 - **Comprehensive logging** - Timestamped logs for all operations
@@ -202,6 +220,7 @@ Existing dependencies:
 - **Button state management** - Search button disabled during operation to prevent multiple simultaneous searches
 
 #### Code Quality
+
 - **Added docstrings** - All major methods now documented
 - **Consistent font usage** - Standardized on "Roboto Medium" across all UI elements
 - **Proper package structure** - Added `__init__.py` to functions/ and generate/ directories
