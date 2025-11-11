@@ -661,7 +661,9 @@ class RunescapeNameChecker:
         """Main search function that runs in a separate thread with multi-threading."""
         try:
             self.stop_event.clear()
-            self.results_data = []  # Clear previous results
+            # Clear previous results (thread-safe)
+            with self.data_lock:
+                self.results_data = []
 
             names: List[str] = name_entry_text.split(",")
             
@@ -821,10 +823,6 @@ class RunescapeNameChecker:
         self.search_button.configure(state="disabled")
         # Disable export button during search
         self.export_button.configure(state="disabled")
-        
-        # Clear previous results to prevent unbounded memory growth
-        with self.data_lock:
-            self.results_data = []
         
         # Clear results display
         self.guide_textbox.delete(1.0, "end")
