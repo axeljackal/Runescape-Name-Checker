@@ -11,6 +11,7 @@ import json
 import os
 from pathlib import Path
 from tkinter import filedialog
+from tkinterdnd2 import DND_FILES, TkinterDnD
 import pandas as pd
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -19,16 +20,31 @@ import logging
 
 class RunescapeNameChecker:
     def __init__(self):
-        self.root = ctk.CTk()
+        # Set appearance before creating window
+        ctk.set_appearance_mode("dark")
+        ctk.set_default_color_theme("blue")
+        
+        # Create root with drag-and-drop support
+        self.root = TkinterDnD.Tk()
+        
+        # Configure window background to match dark theme
+        self.root.configure(bg='#2b2b2b')
+        
         self.root.geometry("700x500")
         self.root.title("RSNChecker v1.8")
         self.root.resizable(False, False)
+        
+        # Ensure proper cleanup on window close
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         
         # Initialize stop flag for thread control
         self.stop_event = threading.Event()
         
         # Thread lock for shared data structures
         self.data_lock = threading.Lock()
+        
+        # Track active executor for proper shutdown
+        self.active_executor = None
         
         # Initialize progress tracking
         self.progress_file = "progress.json"
@@ -62,9 +78,13 @@ class RunescapeNameChecker:
             self.search_frame,
             width=220,
             font=("Roboto Medium", 12),
-            placeholder_text="Enter usernames or load file",
+            placeholder_text="Enter usernames or drop .txt file here",
         )
         self.name_entry.place(x=10, y=35)
+        
+        # Enable drag & drop on the root window
+        self.root.drop_target_register(DND_FILES)
+        self.root.dnd_bind('<<Drop>>', self.on_file_drop)
         
         # Load file button
         self.load_file_button = ctk.CTkButton(
@@ -340,9 +360,8 @@ class RunescapeNameChecker:
                 return False
             except Exception as e:
                 # Name not found means it's potentially available
-                # Log actual errors for debugging
                 error_str = str(e).lower()
-                if "not found" in error_str or "404" in error_str:
+                if "not found" in error_str or "404" in error_str or "unable to find" in error_str:
                     return True
                 else:
                     # Network or API error - return error message
@@ -353,7 +372,7 @@ class RunescapeNameChecker:
                 return False
             except Exception as e:
                 error_str = str(e).lower()
-                if "not found" in error_str or "404" in error_str:
+                if "not found" in error_str or "404" in error_str or "unable to find" in error_str:
                     return True
                 else:
                     return ("error", str(e)[:50])
@@ -454,6 +473,35 @@ class RunescapeNameChecker:
                 self.log_message(error_msg)
                 self.logger.error(error_msg)
     
+    def on_file_drop(self, event):
+        """Handle drag & drop of .txt files."""
+        # Get the file path from the drop event
+        # The event.data may have curly braces if path has spaces
+        file_path = event.data.strip('{}').strip()
+        
+        # Check if it's a .txt file
+        if not file_path.lower().endswith('.txt'):
+            self.log_message("[error] Only .txt files are supported for drag & drop")
+            self.logger.warning(f"Attempted to drop non-txt file: {file_path}")
+            return
+        
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                # Replace newlines with commas
+                names = content.replace('\n', ',').replace('\r', '')
+                self.name_entry.delete(0, "end")
+                self.name_entry.insert(0, names)
+                
+                # Count names
+                name_count = len([n.strip() for n in names.split(',') if n.strip()])
+                self.log_message(f"📂 Dropped {name_count} names from: {os.path.basename(file_path)}")
+                self.logger.info(f"Drag & drop loaded {name_count} names from: {file_path}")
+        except Exception as e:
+            error_msg = f"[error] Failed to load dropped file: {str(e)}"
+            self.log_message(error_msg)
+            self.logger.error(error_msg)
+    
     def update_workers(self, value):
         """Update the number of worker threads."""
         self.max_workers = int(value)
@@ -461,8 +509,28 @@ class RunescapeNameChecker:
     
     def check_single_name(self, name: str, source: str) -> dict:
         """Check a single name with rate limiting and detailed status tracking."""
+        # Check if stop was requested before starting
+        if self.stop_event.is_set():
+            return {
+                'name': name,
+                'source': source,
+                'available': None,
+                'error': 'Cancelled by user',
+                'status': 'error'
+            }
+        
         # Rate limiting: 100ms delay per check
         time.sleep(0.1)
+        
+        # Check again after sleep in case stop was requested
+        if self.stop_event.is_set():
+            return {
+                'name': name,
+                'source': source,
+                'available': None,
+                'error': 'Cancelled by user',
+                'status': 'error'
+            }
         
         result_dict = {
             'name': name,
@@ -482,7 +550,7 @@ class RunescapeNameChecker:
                 result_dict['available'] = False
                 result_dict['status'] = 'checked'
             elif isinstance(result, tuple) and result[0] == "error":
-                result_dict['available'] = False
+                result_dict['available'] = None  # Unknown due to error
                 result_dict['error'] = result[1]
                 result_dict['status'] = 'error'
             
@@ -521,48 +589,45 @@ class RunescapeNameChecker:
         return result_dict
     
     def export_results(self):
-        """Export results to CSV or XLSX file with enhanced status tracking."""
+        """Export results to XLSX file with enhanced status tracking."""
         if not self.results_data:
             self.log_message("[info] No results to export")
             self.logger.warning("Export attempted with no results")
             return
         
-        # Ask user for file type and location
-        file_path = filedialog.asksaveasfilename(
-            defaultextension=".xlsx",
-            filetypes=[("Excel files", "*.xlsx"), ("CSV files", "*.csv")],
-            title="Save results as"
-        )
+        # Create output directory if it doesn't exist
+        if not os.path.exists('output'):
+            os.makedirs('output')
         
-        if file_path:
-            try:
-                # Create DataFrame
-                df = pd.DataFrame(self.results_data)
-                
-                # Add formatted columns
-                df['AVAILABLE'] = df['available'].apply(lambda x: 'YES' if x else ('NO' if x is False else 'ERROR'))
-                df['STATUS'] = df['status'].str.upper()
-                
-                # Select and reorder columns
-                columns = ['name', 'AVAILABLE', 'STATUS']
-                if 'error' in df.columns:
-                    columns.append('error')
-                
-                export_df = df[columns].copy()
-                export_df.columns = [col.upper() for col in columns]
-                
-                # Export based on file extension
-                if file_path.endswith('.csv'):
-                    export_df.to_csv(file_path, index=False, encoding='utf-8')
-                else:
-                    export_df.to_excel(file_path, index=False, engine='openpyxl')
-                
-                self.log_message(f"[success] Results exported to: {os.path.basename(file_path)}")
-                self.logger.info(f"Results exported to {file_path} ({len(export_df)} rows)")
-            except Exception as e:
-                error_msg = f"[error] Export failed: {str(e)}"
-                self.log_message(error_msg)
-                self.logger.error(f"Export failed: {e}")
+        # Generate default filename with timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        default_filename = f"output/rsn_results_{timestamp}.xlsx"
+        
+        try:
+            # Create DataFrame
+            df = pd.DataFrame(self.results_data)
+            
+            # Add formatted columns
+            df['AVAILABLE'] = df['available'].apply(lambda x: 'YES' if x else ('NO' if x is False else 'ERROR'))
+            df['STATUS'] = df['status'].str.upper()
+            
+            # Select and reorder columns
+            columns = ['name', 'AVAILABLE', 'STATUS']
+            if 'error' in df.columns:
+                columns.append('error')
+            
+            export_df = df[columns].copy()
+            export_df.columns = [col.upper() for col in columns]
+            
+            # Auto-save to default filename
+            export_df.to_excel(default_filename, index=False, engine='openpyxl')
+            
+            self.log_message(f"[success] Results exported to: {default_filename}")
+            self.logger.info(f"Results exported to {default_filename} ({len(export_df)} rows)")
+        except Exception as e:
+            error_msg = f"[error] Export failed: {str(e)}"
+            self.log_message(error_msg)
+            self.logger.error(f"Export failed: {e}")
 
     def search_name(self, name_entry_text: str, source: str):
         """Main search function that runs in a separate thread with multi-threading."""
@@ -634,6 +699,9 @@ class RunescapeNameChecker:
             # Use ThreadPoolExecutor for concurrent checking
             completed = 0
             with ThreadPoolExecutor(max_workers=actual_workers) as executor:
+                # Track active executor for proper shutdown
+                self.active_executor = executor
+                
                 # Submit all tasks
                 future_to_name = {
                     executor.submit(self.check_single_name, name, source): name 
@@ -645,6 +713,13 @@ class RunescapeNameChecker:
                     if self.stop_event.is_set():
                         self.log_message(f"{functions.time.get_time()}: Search stopped by user")
                         self.logger.info(f"Search stopped by user at {completed}/{total_names}")
+                        
+                        # Cancel all pending futures
+                        for f in future_to_name.keys():
+                            f.cancel()
+                        
+                        # Force executor shutdown
+                        executor.shutdown(wait=False, cancel_futures=True)
                         break
                     
                     name = future_to_name[future]
@@ -700,7 +775,11 @@ class RunescapeNameChecker:
             # Handle any unexpected errors
             self.log_message(f"[FATAL ERROR] {str(e)}")
             self.update_progress("Error occurred")
+            self.logger.error(f"Fatal error in search_name: {e}")
         finally:
+            # Clear active executor reference
+            self.active_executor = None
+            
             # Always re-enable buttons
             self.root.after(0, lambda: self.search_button.configure(state="normal"))
             self.root.after(0, lambda: self.export_button.configure(state="normal"))
@@ -732,7 +811,34 @@ class RunescapeNameChecker:
         """Stop the current search operation."""
         self.stop_event.set()
         self.log_message(f"{functions.time.get_time()}: Stop requested by user")
+        self.logger.info("Stop requested by user")
         self.update_progress("Stopping...")
+        
+        # Force shutdown of active executor if it exists
+        if self.active_executor:
+            try:
+                self.active_executor.shutdown(wait=False, cancel_futures=True)
+                self.logger.info("Active executor shutdown initiated")
+            except Exception as e:
+                self.logger.error(f"Error shutting down executor: {e}")
+    
+    def on_closing(self):
+        """Handle window close event - ensure all threads are stopped."""
+        self.logger.info("Application closing - stopping all operations")
+        
+        # Set stop event
+        self.stop_event.set()
+        
+        # Force shutdown active executor
+        if self.active_executor:
+            try:
+                self.active_executor.shutdown(wait=False, cancel_futures=True)
+                self.logger.info("Executor shutdown on close")
+            except Exception as e:
+                self.logger.error(f"Error during close: {e}")
+        
+        # Destroy the window
+        self.root.destroy()
 
     def run(self):
         self.root.mainloop()
