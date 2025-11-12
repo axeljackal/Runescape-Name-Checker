@@ -120,9 +120,9 @@ self.name_status = {
 
 ### Scenario: Retry Failed Checks
 
-**Run 1 (with network issues):**
+**First run:**
 
-```
+```text
 [result] Player1 not found on OSRS -> potentially available
 [error] Player2: Connection timeout
 [result] Player3 found on OSRS -> taken
@@ -131,7 +131,7 @@ self.name_status = {
 
 **Run 2 (network fixed):**
 
-```
+```text
 [skipped] Player1 - already checked (Available)
 [retry] Player2 - retrying after previous error
 [skipped] Player3 - already checked (Taken)
@@ -140,9 +140,9 @@ self.name_status = {
 
 ### Scenario: Log Analysis
 
-Check `logs/rsn_checker_20251111_185210.log`:
+Check `logs/` directory for detailed run logs with timestamps:
 
-```
+```text
 2025-11-11 18:52:10,123 - INFO - RSNChecker v1.8 started
 2025-11-11 18:52:10,234 - INFO - Loaded 150 names from file: usernames.txt
 2025-11-11 18:52:15,456 - INFO - Checked PlayerName (OSRS): Available
