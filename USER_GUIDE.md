@@ -46,7 +46,7 @@
 - Plain text (.txt) files only
 - Example file content:
 
-  ```
+  ```text
   NameOne
   NameTwo
   NameThree
@@ -139,7 +139,7 @@
 
 **Export structure:**
 
-```
+```text
 NAME          | AVAILABLE
 --------------|----------
 Username1     | Yes
@@ -183,7 +183,7 @@ for _ in range(50)  # Change 50 to your desired number
 
 ### Example 1: Quick Manual Check
 
-```
+```text
 1. Type: "DragonKing, SwordMaster, RuneKnight"
 2. Select: OSRS
 3. Click: "Check Name Availability"
@@ -193,7 +193,7 @@ for _ in range(50)  # Change 50 to your desired number
 
 ### Example 2: Large File Processing
 
-```
+```text
 1. Prepare names.txt with 200 names (one per line)
 2. Click "Load File", select names.txt
 3. Adjust workers slider to 8 (for faster checking)
@@ -207,7 +207,7 @@ for _ in range(50)  # Change 50 to your desired number
 
 ### Example 3: Interrupted Search Resume
 
-```
+```text
 Day 1:
 1. Load file with 500 names
 2. Start checking
@@ -225,7 +225,7 @@ Day 2:
 
 ### Example 4: Multiple Sessions
 
-```
+```text
 Session 1 - Fantasy Names:
 1. Load fantasy_names.txt
 2. Check all names

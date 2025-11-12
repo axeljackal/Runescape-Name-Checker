@@ -123,7 +123,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
 
 ### 🔧 Technical Implementation
 
-#### New Methods
+#### New Methods in v1.7
 
 - `load_file()` - Opens file dialog, reads .txt, populates entry field
 - `load_progress()` - Loads checked names from progress.json
@@ -160,7 +160,7 @@ All notable changes to the Runescape Name Checker project will be documented in 
 - `self.results_data = []` - Store results for export
 - `self.progress_file = "progress.json"` - Path to progress checkpoint file
 
-### 📦 Dependencies
+### 📦 Dependencies Added in v1.7
 
 Added to requirements.txt:
 
@@ -174,7 +174,7 @@ Existing dependencies:
 - customtkinter
 - pyperclip
 
-### 📝 Files Changed
+### 📝 Files Changed in v1.7
 
 - `main.py` - Major feature additions (7 new methods, 1 major rewrite, expanded UI)
 - `requirements.txt` - Added pandas and openpyxl

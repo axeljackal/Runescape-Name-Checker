@@ -9,7 +9,6 @@ import functions.time
 import generate.random
 import json
 import os
-from pathlib import Path
 from tkinter import filedialog
 from tkinterdnd2 import DND_FILES, TkinterDnD
 import pandas as pd

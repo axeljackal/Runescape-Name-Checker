@@ -28,7 +28,7 @@ This ensures you never waste API calls on names already verified, while allowing
 
 Every time you run RSNChecker, a new log file is created in the `logs/` directory:
 
-```
+```text
 logs/rsn_checker_20251111_185210.log
 logs/rsn_checker_20251111_192345.log
 logs/rsn_checker_20251111_203001.log
@@ -107,7 +107,7 @@ You run a check with poor internet connection. Some names fail with errors:
 
 **First run:**
 
-```
+```text
 [result] Player1 not found on OSRS -> potentially available
 [error] Player2: Connection timeout
 [result] Player3 found on OSRS -> taken
@@ -126,13 +126,13 @@ The system automatically:
 
 Something went wrong? Check the log files:
 
-```
+```text
 logs/rsn_checker_20251111_185210.log
 ```
 
 Contains detailed information:
 
-```
+```text
 2025-11-11 18:52:10,123 - INFO - RSNChecker v1.8 started
 2025-11-11 18:52:10,234 - INFO - Loaded progress: 150 checked, 5 errors
 2025-11-11 18:52:15,456 - INFO - Checked PlayerName (OSRS Hiscores): Available

@@ -27,18 +27,18 @@
 - **Non-blocking UI**: Responsive interface that never freezes
 - **Smart Validation**: Comprehensive input validation with helpful error messages
 
-# 🧭 Demo
+## 🧭 Demo
 
 ![Image](/images/image.png?raw=true "Demo")
 
-# ✍️ Manual Setup
+## ✍️ Manual Setup
 
-+ Download [Python](https://www.python.org/)
+- Download [Python](https://www.python.org/)
 - Clone repo `https://github.com/axeljackal/Runescape-Name-Checker.git`
 - Install requirements `pip install -r requirements.txt`
-- Run code `python3 main.py` <br />
+- Run code `python3 main.py`
 
-# 📖 How to Use
+## 📖 How to Use
 
 ## Basic Search
 
@@ -48,13 +48,13 @@
 
 ## File Loading
 
-**Option 1: Button**
+### Option 1: Button
 
 1. Click "Load File" button
 2. Select a .txt file with one name per line (recommended to keep in `input/` folder)
 3. Names will automatically populate the input field
 
-**Option 2: Drag & Drop** 🆕
+### Option 2: Drag & Drop 🆕
 
 1. Place your .txt file in the `input/` folder
 2. Drag the file and drop it anywhere on the RSNChecker window
@@ -82,7 +82,7 @@
 3. Opens in output folder with timestamp
 4. Includes NAME, AVAILABLE, STATUS, and ERROR columns
 
-# ✏️ Generate
+## ✏️ Generate
 
 You can now generate (50) unique 2/3 letter /+ number RSN's to check
 
@@ -99,8 +99,8 @@ def two_letter_func(name_entry):
 
 Where it says `for _ in range(50)` change `50` to your desired number
 
-# ❤️ Credits
+## ❤️ Credits
 
-+ [aellas](https://github.com/aellas) for original RSNChecker code and concept
+- [aellas](https://github.com/aellas) for original RSNChecker code and concept
 - [Luciano Feder](https://github.com/lucianofeder) for [RS3 API Wrapper](https://github.com/lucianofeder/runescape3-api-wrapper)
 - [Chasesc](https://github.com/Chasesc) for [OSRS API Wrapper](https://github.com/Chasesc/OSRS-API-Wrapper)
